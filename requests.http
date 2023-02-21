@@ -1,0 +1,12 @@
+GET http://localhost:80/api/v1/intraday
+###
+GET http://localhost:80/api/v1/intraday?page=1
+###
+GET http://localhost:80/api/v1/intraday?page=2
+###
+GET http://localhost:80/api/v1/intraday?page=3
+###
+GET http://localhost:80/api/v1/intraday?page=4
+###
+GET http://localhost:80/api/v1/intraday?page=5
+###

@@ -12,6 +12,7 @@ import (
 	"github.com/gpsinsight/go-interview-challenge/internal/config"
 	"github.com/gpsinsight/go-interview-challenge/internal/consumer"
 	"github.com/gpsinsight/go-interview-challenge/internal/server"
+	"github.com/gpsinsight/go-interview-challenge/internal/store"
 	"github.com/gpsinsight/go-interview-challenge/pkg/messages"
 
 	"github.com/confluentinc/confluent-kafka-go/schemaregistry"
@@ -71,10 +72,14 @@ func main() {
 		log.WithError(err).Fatal("failed to register IntradayValue message type")
 	}
 
+	intradayStore := store.NewPgIntradayStore(db, log)
+
 	kafkaConsumer := consumer.NewKafkaConsumer(
 		kafkaReader,
 		protoDeserializer,
-		db,
+		messages.NewIntradayValueProcessor(
+			intradayStore,
+		),
 		log,
 	)
 	go kafkaConsumer.Run(ctx)
@@ -82,6 +87,7 @@ func main() {
 	log.Info("Starting up go-interview-challenge")
 
 	srvr := server.New(cfg, log)
+	srvr.Route(intradayStore)
 	defer func() {
 		err := srvr.Shutdown(context.Background())
 		if err != nil {
