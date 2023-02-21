@@ -75,9 +75,7 @@ func main() {
 	kafkaConsumer := consumer.NewKafkaConsumer(
 		kafkaReader,
 		protoDeserializer,
-		messages.NewIntradayValueProcessor(
-			store.NewPgIntradayStore(db),
-		),
+		store.NewPgIntradayStore(db),
 		log,
 	)
 	go kafkaConsumer.Run(ctx)

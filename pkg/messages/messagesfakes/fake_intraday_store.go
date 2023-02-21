@@ -8,12 +8,12 @@ import (
 	"github.com/gpsinsight/go-interview-challenge/pkg/messages"
 )
 
-type FakeIntradayValueStore struct {
-	InsertStub        func(context.Context, *messages.IntradayValue) error
+type FakeIntradayStore struct {
+	InsertStub        func(context.Context, messages.IntradayValue) error
 	insertMutex       sync.RWMutex
 	insertArgsForCall []struct {
 		arg1 context.Context
-		arg2 *messages.IntradayValue
+		arg2 messages.IntradayValue
 	}
 	insertReturns struct {
 		result1 error
@@ -38,12 +38,12 @@ type FakeIntradayValueStore struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeIntradayValueStore) Insert(arg1 context.Context, arg2 *messages.IntradayValue) error {
+func (fake *FakeIntradayStore) Insert(arg1 context.Context, arg2 messages.IntradayValue) error {
 	fake.insertMutex.Lock()
 	ret, specificReturn := fake.insertReturnsOnCall[len(fake.insertArgsForCall)]
 	fake.insertArgsForCall = append(fake.insertArgsForCall, struct {
 		arg1 context.Context
-		arg2 *messages.IntradayValue
+		arg2 messages.IntradayValue
 	}{arg1, arg2})
 	stub := fake.InsertStub
 	fakeReturns := fake.insertReturns
@@ -58,26 +58,26 @@ func (fake *FakeIntradayValueStore) Insert(arg1 context.Context, arg2 *messages.
 	return fakeReturns.result1
 }
 
-func (fake *FakeIntradayValueStore) InsertCallCount() int {
+func (fake *FakeIntradayStore) InsertCallCount() int {
 	fake.insertMutex.RLock()
 	defer fake.insertMutex.RUnlock()
 	return len(fake.insertArgsForCall)
 }
 
-func (fake *FakeIntradayValueStore) InsertCalls(stub func(context.Context, *messages.IntradayValue) error) {
+func (fake *FakeIntradayStore) InsertCalls(stub func(context.Context, messages.IntradayValue) error) {
 	fake.insertMutex.Lock()
 	defer fake.insertMutex.Unlock()
 	fake.InsertStub = stub
 }
 
-func (fake *FakeIntradayValueStore) InsertArgsForCall(i int) (context.Context, *messages.IntradayValue) {
+func (fake *FakeIntradayStore) InsertArgsForCall(i int) (context.Context, messages.IntradayValue) {
 	fake.insertMutex.RLock()
 	defer fake.insertMutex.RUnlock()
 	argsForCall := fake.insertArgsForCall[i]
 	return argsForCall.arg1, argsForCall.arg2
 }
 
-func (fake *FakeIntradayValueStore) InsertReturns(result1 error) {
+func (fake *FakeIntradayStore) InsertReturns(result1 error) {
 	fake.insertMutex.Lock()
 	defer fake.insertMutex.Unlock()
 	fake.InsertStub = nil
@@ -86,7 +86,7 @@ func (fake *FakeIntradayValueStore) InsertReturns(result1 error) {
 	}{result1}
 }
 
-func (fake *FakeIntradayValueStore) InsertReturnsOnCall(i int, result1 error) {
+func (fake *FakeIntradayStore) InsertReturnsOnCall(i int, result1 error) {
 	fake.insertMutex.Lock()
 	defer fake.insertMutex.Unlock()
 	fake.InsertStub = nil
@@ -100,7 +100,7 @@ func (fake *FakeIntradayValueStore) InsertReturnsOnCall(i int, result1 error) {
 	}{result1}
 }
 
-func (fake *FakeIntradayValueStore) List(arg1 context.Context) ([]messages.IntradayValue, error) {
+func (fake *FakeIntradayStore) List(arg1 context.Context) ([]messages.IntradayValue, error) {
 	fake.listMutex.Lock()
 	ret, specificReturn := fake.listReturnsOnCall[len(fake.listArgsForCall)]
 	fake.listArgsForCall = append(fake.listArgsForCall, struct {
@@ -119,26 +119,26 @@ func (fake *FakeIntradayValueStore) List(arg1 context.Context) ([]messages.Intra
 	return fakeReturns.result1, fakeReturns.result2
 }
 
-func (fake *FakeIntradayValueStore) ListCallCount() int {
+func (fake *FakeIntradayStore) ListCallCount() int {
 	fake.listMutex.RLock()
 	defer fake.listMutex.RUnlock()
 	return len(fake.listArgsForCall)
 }
 
-func (fake *FakeIntradayValueStore) ListCalls(stub func(context.Context) ([]messages.IntradayValue, error)) {
+func (fake *FakeIntradayStore) ListCalls(stub func(context.Context) ([]messages.IntradayValue, error)) {
 	fake.listMutex.Lock()
 	defer fake.listMutex.Unlock()
 	fake.ListStub = stub
 }
 
-func (fake *FakeIntradayValueStore) ListArgsForCall(i int) context.Context {
+func (fake *FakeIntradayStore) ListArgsForCall(i int) context.Context {
 	fake.listMutex.RLock()
 	defer fake.listMutex.RUnlock()
 	argsForCall := fake.listArgsForCall[i]
 	return argsForCall.arg1
 }
 
-func (fake *FakeIntradayValueStore) ListReturns(result1 []messages.IntradayValue, result2 error) {
+func (fake *FakeIntradayStore) ListReturns(result1 []messages.IntradayValue, result2 error) {
 	fake.listMutex.Lock()
 	defer fake.listMutex.Unlock()
 	fake.ListStub = nil
@@ -148,7 +148,7 @@ func (fake *FakeIntradayValueStore) ListReturns(result1 []messages.IntradayValue
 	}{result1, result2}
 }
 
-func (fake *FakeIntradayValueStore) ListReturnsOnCall(i int, result1 []messages.IntradayValue, result2 error) {
+func (fake *FakeIntradayStore) ListReturnsOnCall(i int, result1 []messages.IntradayValue, result2 error) {
 	fake.listMutex.Lock()
 	defer fake.listMutex.Unlock()
 	fake.ListStub = nil
@@ -164,7 +164,7 @@ func (fake *FakeIntradayValueStore) ListReturnsOnCall(i int, result1 []messages.
 	}{result1, result2}
 }
 
-func (fake *FakeIntradayValueStore) Invocations() map[string][][]interface{} {
+func (fake *FakeIntradayStore) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
 	fake.insertMutex.RLock()
@@ -178,7 +178,7 @@ func (fake *FakeIntradayValueStore) Invocations() map[string][][]interface{} {
 	return copiedInvocations
 }
 
-func (fake *FakeIntradayValueStore) recordInvocation(key string, args []interface{}) {
+func (fake *FakeIntradayStore) recordInvocation(key string, args []interface{}) {
 	fake.invocationsMutex.Lock()
 	defer fake.invocationsMutex.Unlock()
 	if fake.invocations == nil {
@@ -190,4 +190,4 @@ func (fake *FakeIntradayValueStore) recordInvocation(key string, args []interfac
 	fake.invocations[key] = append(fake.invocations[key], args)
 }
 
-var _ messages.IntradayValueStore = new(FakeIntradayValueStore)
+var _ messages.IntradayStore = new(FakeIntradayStore)

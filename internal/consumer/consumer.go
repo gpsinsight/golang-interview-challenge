@@ -3,9 +3,9 @@ package consumer
 import (
 	"context"
 	"errors"
-	"fmt"
 
 	"github.com/confluentinc/confluent-kafka-go/schemaregistry/serde/protobuf"
+	"github.com/gpsinsight/go-interview-challenge/internal/store"
 	"github.com/gpsinsight/go-interview-challenge/pkg/messages"
 	"github.com/segmentio/kafka-go"
 	"github.com/sirupsen/logrus"
@@ -14,20 +14,20 @@ import (
 type KafkaConsumer struct {
 	reader       *kafka.Reader
 	deserializer *protobuf.Deserializer
-	processor    messages.IntradayValueProcessor
+	store        messages.IntradayStore
 	logger       *logrus.Entry
 }
 
 func NewKafkaConsumer(
 	reader *kafka.Reader,
 	deserializer *protobuf.Deserializer,
-	processor messages.IntradayValueProcessor,
+	store *store.PgIntradayStore,
 	logger *logrus.Entry,
 ) *KafkaConsumer {
 	return &KafkaConsumer{
 		reader:       reader,
 		deserializer: deserializer,
-		processor:    processor,
+		store:        store,
 		logger:       logger,
 	}
 }
@@ -58,21 +58,13 @@ func (kc *KafkaConsumer) Run(ctx context.Context) {
 }
 
 func (kc *KafkaConsumer) processMessage(ctx context.Context, msg kafka.Message) error {
-	kc.logger.Infof("received message: %s", string(msg.Key))
 	/**
 	   * TODO:
 		 * - deserialize protobuf message
 		 * - insert data into postgres table
 	*/
 
-	value, err := kc.deserializer.Deserialize(msg.Topic, msg.Value)
-	if err != nil {
-		return fmt.Errorf("unable to deserialize message: %s", err)
-	}
-
-	v := value.(*messages.IntradayValue)
-
-	err = kc.processor(ctx, v)
+	kc.logger.Infof("received message: %s", string(msg.Key))
 
 	return nil
 }
