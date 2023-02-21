@@ -11,8 +11,17 @@ import (
 	"github.com/gpsinsight/go-interview-challenge/internal/store"
 	"github.com/gpsinsight/go-interview-challenge/pkg/messages"
 	"github.com/jmoiron/sqlx"
+	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/require"
 )
+
+func testLogger() *logrus.Entry {
+	logger := logrus.New()
+	logger.SetFormatter(&logrus.JSONFormatter{})
+	log := logger.WithField("environment", "testing")
+
+	return log
+}
 
 func Test_Insert(t *testing.T) {
 	ctx := context.TODO()
@@ -21,6 +30,8 @@ func Test_Insert(t *testing.T) {
 		t.Fatal(err)
 	}
 	sqlxdb := sqlx.NewDb(db, "sqlmock")
+
+	log := testLogger()
 
 	value := messages.IntradayValue{
 		Ticker:    "TEST",
@@ -61,11 +72,59 @@ func Test_Insert(t *testing.T) {
 		tt := tt
 		t.Run(tt.label, func(t *testing.T) {
 			tt.setup(t)
-			writer := store.NewPgIntradayStore(sqlxdb)
+			writer := store.NewPgIntradayStore(sqlxdb, log)
 			err := writer.Insert(ctx, &value)
 			if err != nil {
 				require.EqualError(t, err, tt.err.Error())
 			}
 		})
 	}
+}
+
+func Test_List(t *testing.T) {
+	ctx := context.TODO()
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatal(err)
+	}
+	sqlxdb := sqlx.NewDb(db, "sqlmock")
+	log := testLogger()
+
+	type page struct {
+		offset int
+		limit  int
+	}
+
+	tests := []struct {
+		label string
+		page  page
+		setup func(*testing.T)
+	}{
+		{
+			label: "success",
+			page: page{
+				limit:  1,
+				offset: 0,
+			},
+			setup: func(t *testing.T) {
+				mockRows := sqlmock.NewRows([]string{"ticker", "timestamp", "open", "high", "low", "close", "volume"}).
+					AddRow("FOO", "2023-02-21 15:00:00", 100, 101, 99, 100, 1000)
+
+				mock.ExpectQuery(
+					regexp.QuoteMeta("SELECT ticker, timestamp, open, high, low, close, volume FROM intraday ORDER BY timestamp ASC LIMIT 1 OFFSET 0")).
+					WillReturnRows(mockRows)
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		tt := tt
+		tt.setup(t)
+		t.Run(tt.label, func(t *testing.T) {
+			lister := store.NewPgIntradayStore(sqlxdb, log)
+			_, err := lister.List(ctx, tt.page.limit, tt.page.offset)
+			require.NoError(t, err)
+		})
+	}
+
 }
