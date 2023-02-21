@@ -8,16 +8,19 @@ import (
 	sq "github.com/Masterminds/squirrel"
 	"github.com/gpsinsight/go-interview-challenge/pkg/messages"
 	"github.com/jmoiron/sqlx"
+	"github.com/sirupsen/logrus"
 )
 
 type PgIntradayStore struct {
-	db *sqlx.DB
+	db  *sqlx.DB
+	log *logrus.Entry
 }
 
 // NewPgIntradayStore configures a PgIntradayStore with a db and returns it
-func NewPgIntradayStore(db *sqlx.DB) *PgIntradayStore {
+func NewPgIntradayStore(db *sqlx.DB, log *logrus.Entry) *PgIntradayStore {
 	return &PgIntradayStore{
-		db: db,
+		db:  db,
+		log: log,
 	}
 }
 
@@ -44,6 +47,38 @@ func (p PgIntradayStore) Insert(ctx context.Context, val *messages.IntradayValue
 }
 
 // List returns a collection of IntradayValue from the DB
-func (p PgIntradayStore) List(ctx context.Context) ([]messages.IntradayValue, error) {
-	return nil, nil
+func (p PgIntradayStore) List(ctx context.Context, limit, offset int) ([]*messages.IntradayValue, error) {
+	query := sq.
+		Select("ticker", "timestamp", "open", "high", "low", "close", "volume").
+		From("intraday").
+		OrderBy("timestamp ASC").
+		Limit(uint64(limit)).
+		Offset(uint64(offset))
+
+	q, _, err := query.ToSql()
+	if err != nil {
+		return nil, fmt.Errorf("unable to generate SQL from query: %w", err)
+	}
+
+	query = query.RunWith(p.db)
+
+	logrus.Info("query: ", q)
+
+	rows, err := query.QueryContext(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("unable to select list from DB: %w", err)
+	}
+	defer rows.Close()
+
+	list := []*messages.IntradayValue{}
+	for rows.Next() {
+		v := &messages.IntradayValue{}
+		err := rows.Scan(&v.Ticker, &v.Timestamp, &v.Open, &v.High, &v.Low, &v.Close, &v.Volume)
+		if err != nil {
+			return nil, fmt.Errorf("unable to scan row to value: %w", err)
+		}
+		list = append(list, v)
+	}
+
+	return list, nil
 }

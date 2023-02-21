@@ -21,17 +21,19 @@ type FakeIntradayValueStore struct {
 	insertReturnsOnCall map[int]struct {
 		result1 error
 	}
-	ListStub        func(context.Context) ([]messages.IntradayValue, error)
+	ListStub        func(context.Context, int, int) ([]*messages.IntradayValue, error)
 	listMutex       sync.RWMutex
 	listArgsForCall []struct {
 		arg1 context.Context
+		arg2 int
+		arg3 int
 	}
 	listReturns struct {
-		result1 []messages.IntradayValue
+		result1 []*messages.IntradayValue
 		result2 error
 	}
 	listReturnsOnCall map[int]struct {
-		result1 []messages.IntradayValue
+		result1 []*messages.IntradayValue
 		result2 error
 	}
 	invocations      map[string][][]interface{}
@@ -100,18 +102,20 @@ func (fake *FakeIntradayValueStore) InsertReturnsOnCall(i int, result1 error) {
 	}{result1}
 }
 
-func (fake *FakeIntradayValueStore) List(arg1 context.Context) ([]messages.IntradayValue, error) {
+func (fake *FakeIntradayValueStore) List(arg1 context.Context, arg2 int, arg3 int) ([]*messages.IntradayValue, error) {
 	fake.listMutex.Lock()
 	ret, specificReturn := fake.listReturnsOnCall[len(fake.listArgsForCall)]
 	fake.listArgsForCall = append(fake.listArgsForCall, struct {
 		arg1 context.Context
-	}{arg1})
+		arg2 int
+		arg3 int
+	}{arg1, arg2, arg3})
 	stub := fake.ListStub
 	fakeReturns := fake.listReturns
-	fake.recordInvocation("List", []interface{}{arg1})
+	fake.recordInvocation("List", []interface{}{arg1, arg2, arg3})
 	fake.listMutex.Unlock()
 	if stub != nil {
-		return stub(arg1)
+		return stub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
@@ -125,41 +129,41 @@ func (fake *FakeIntradayValueStore) ListCallCount() int {
 	return len(fake.listArgsForCall)
 }
 
-func (fake *FakeIntradayValueStore) ListCalls(stub func(context.Context) ([]messages.IntradayValue, error)) {
+func (fake *FakeIntradayValueStore) ListCalls(stub func(context.Context, int, int) ([]*messages.IntradayValue, error)) {
 	fake.listMutex.Lock()
 	defer fake.listMutex.Unlock()
 	fake.ListStub = stub
 }
 
-func (fake *FakeIntradayValueStore) ListArgsForCall(i int) context.Context {
+func (fake *FakeIntradayValueStore) ListArgsForCall(i int) (context.Context, int, int) {
 	fake.listMutex.RLock()
 	defer fake.listMutex.RUnlock()
 	argsForCall := fake.listArgsForCall[i]
-	return argsForCall.arg1
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
 }
 
-func (fake *FakeIntradayValueStore) ListReturns(result1 []messages.IntradayValue, result2 error) {
+func (fake *FakeIntradayValueStore) ListReturns(result1 []*messages.IntradayValue, result2 error) {
 	fake.listMutex.Lock()
 	defer fake.listMutex.Unlock()
 	fake.ListStub = nil
 	fake.listReturns = struct {
-		result1 []messages.IntradayValue
+		result1 []*messages.IntradayValue
 		result2 error
 	}{result1, result2}
 }
 
-func (fake *FakeIntradayValueStore) ListReturnsOnCall(i int, result1 []messages.IntradayValue, result2 error) {
+func (fake *FakeIntradayValueStore) ListReturnsOnCall(i int, result1 []*messages.IntradayValue, result2 error) {
 	fake.listMutex.Lock()
 	defer fake.listMutex.Unlock()
 	fake.ListStub = nil
 	if fake.listReturnsOnCall == nil {
 		fake.listReturnsOnCall = make(map[int]struct {
-			result1 []messages.IntradayValue
+			result1 []*messages.IntradayValue
 			result2 error
 		})
 	}
 	fake.listReturnsOnCall[i] = struct {
-		result1 []messages.IntradayValue
+		result1 []*messages.IntradayValue
 		result2 error
 	}{result1, result2}
 }

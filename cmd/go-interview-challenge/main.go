@@ -72,11 +72,13 @@ func main() {
 		log.WithError(err).Fatal("failed to register IntradayValue message type")
 	}
 
+	intradayStore := store.NewPgIntradayStore(db, log)
+
 	kafkaConsumer := consumer.NewKafkaConsumer(
 		kafkaReader,
 		protoDeserializer,
 		messages.NewIntradayValueProcessor(
-			store.NewPgIntradayStore(db),
+			intradayStore,
 		),
 		log,
 	)
@@ -85,6 +87,7 @@ func main() {
 	log.Info("Starting up go-interview-challenge")
 
 	srvr := server.New(cfg, log)
+	srvr.Route(intradayStore)
 	defer func() {
 		err := srvr.Shutdown(context.Background())
 		if err != nil {
