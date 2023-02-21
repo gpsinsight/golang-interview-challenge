@@ -47,7 +47,7 @@ func (p PgIntradayStore) Insert(ctx context.Context, val *messages.IntradayValue
 }
 
 // List returns a collection of IntradayValue from the DB
-func (p PgIntradayStore) List(ctx context.Context, limit, offset int) ([]messages.IntradayValue, error) {
+func (p PgIntradayStore) List(ctx context.Context, limit, offset int) ([]*messages.IntradayValue, error) {
 	query := sq.
 		Select("ticker", "timestamp", "open", "high", "low", "close", "volume").
 		From("intraday").
@@ -70,9 +70,9 @@ func (p PgIntradayStore) List(ctx context.Context, limit, offset int) ([]message
 	}
 	defer rows.Close()
 
-	list := []messages.IntradayValue{}
+	list := []*messages.IntradayValue{}
 	for rows.Next() {
-		v := messages.IntradayValue{}
+		v := &messages.IntradayValue{}
 		err := rows.Scan(&v.Ticker, &v.Timestamp, &v.Open, &v.High, &v.Low, &v.Close, &v.Volume)
 		if err != nil {
 			return nil, fmt.Errorf("unable to scan row to value: %w", err)

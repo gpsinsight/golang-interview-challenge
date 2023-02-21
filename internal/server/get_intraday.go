@@ -11,8 +11,8 @@ import (
 type GetIntradayHandler func(w http.ResponseWriter, r *http.Request)
 
 type IntradayListResponse struct {
-	Items      []messages.IntradayValue `json:"items"`
-	NextPageID int                      `json:"next_page_id,omitempty"`
+	Items      []*messages.IntradayValue `json:"items"`
+	NextPageID int                       `json:"next_page_id,omitempty"`
 }
 
 func NewGetIntradayHandler(s messages.IntradayValueStore, l *logrus.Entry) GetIntradayHandler {
@@ -50,6 +50,5 @@ func NewGetIntradayHandler(s messages.IntradayValueStore, l *logrus.Entry) GetIn
 			l.Errorf("error writing response: %s", err.Error())
 			return
 		}
-		return
 	}
 }

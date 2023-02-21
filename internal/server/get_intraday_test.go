@@ -74,5 +74,4 @@ func Test_GetIntradayHandler(t *testing.T) {
 
 		assert.Equal(t, http.StatusOK, rr.Code)
 	})
-
 }

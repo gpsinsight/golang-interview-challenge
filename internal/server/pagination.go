@@ -18,7 +18,10 @@ func Pagination(next http.Handler) http.Handler {
 			intPageID, err = strconv.Atoi(pageID)
 			if err != nil {
 				w.WriteHeader(http.StatusBadRequest)
-				w.Write([]byte(fmt.Sprintf("invalid page id, %s must be an integer", PageIDKey)))
+				_, err := w.Write([]byte(fmt.Sprintf("invalid page id, %s must be an integer", PageIDKey)))
+				if err != nil {
+					w.WriteHeader(http.StatusInternalServerError)
+				}
 			}
 		}
 		ctx := context.WithValue(r.Context(), PageIDKey, intPageID)

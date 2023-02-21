@@ -7,5 +7,5 @@ import "context"
 //counterfeiter:generate . IntradayValueStore
 type IntradayValueStore interface {
 	Insert(ctx context.Context, value *IntradayValue) error
-	List(ctx context.Context, limit int, offset int) ([]IntradayValue, error)
+	List(ctx context.Context, limit int, offset int) ([]*IntradayValue, error)
 }

@@ -72,7 +72,5 @@ func (kc *KafkaConsumer) processMessage(ctx context.Context, msg kafka.Message) 
 
 	v := value.(*messages.IntradayValue)
 
-	err = kc.processor(ctx, v)
-
-	return nil
+	return kc.processor(ctx, v)
 }
