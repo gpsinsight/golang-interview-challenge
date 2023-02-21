@@ -1,3 +1,12 @@
+# Implementation Notes
+- The proto timestamp field is a string instead of a google.protobuf.Timestamp, this means a conversion has to happen, which means a decision about where to put that conversion has to happen. I recommend using an actual Timestamp in the proto file.
+- The only way to effectively test a data store is against the storage infrastructure. I am not familiar enough with liquibase to be able to quickly set up a testcontainer with the db running with the correct, current schema. I also am not willing to submit code with no tests, so I used sqlmock...which is more or less pointless.
+- I changed things a little to separate concerns and make testing easier. Maybe for such a small, contrived example as this it is not necessary.
+  - Added a store interface/implementation: I want data storage to be separate from message consumption/deserializing. These are entirely separate concerns and shouldn't live in the same functional unit.
+  - Added a message processor: This treats the messages.IntradayValue type as a sort of domain type. I don't love that, but for the tiny little scope of the application and the time constraints, it'll do.
+- I can't find any unique key constraints on the DB...but it seems like there should be? For a given ticker, it seems like we should disallow entries having the same timestamp value. In the case that we did, I would refactor the store to consider THAT unique key constraint violation and return a sentinel error representing that failure mode.
+
+
 # Go Interview Challenge
 
 Template interview challenge for the GPS Insight api team
