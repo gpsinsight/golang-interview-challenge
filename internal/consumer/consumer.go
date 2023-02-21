@@ -5,7 +5,8 @@ import (
 	"errors"
 
 	"github.com/confluentinc/confluent-kafka-go/schemaregistry/serde/protobuf"
-	"github.com/jmoiron/sqlx"
+	"github.com/gpsinsight/go-interview-challenge/internal/store"
+	"github.com/gpsinsight/go-interview-challenge/pkg/messages"
 	"github.com/segmentio/kafka-go"
 	"github.com/sirupsen/logrus"
 )
@@ -13,20 +14,20 @@ import (
 type KafkaConsumer struct {
 	reader       *kafka.Reader
 	deserializer *protobuf.Deserializer
-	db           *sqlx.DB
+	store        messages.IntradayStore
 	logger       *logrus.Entry
 }
 
 func NewKafkaConsumer(
 	reader *kafka.Reader,
 	deserializer *protobuf.Deserializer,
-	db *sqlx.DB,
+	store *store.PgIntradayStore,
 	logger *logrus.Entry,
 ) *KafkaConsumer {
 	return &KafkaConsumer{
 		reader:       reader,
 		deserializer: deserializer,
-		db:           db,
+		store:        store,
 		logger:       logger,
 	}
 }

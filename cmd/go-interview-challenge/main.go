@@ -12,6 +12,7 @@ import (
 	"github.com/gpsinsight/go-interview-challenge/internal/config"
 	"github.com/gpsinsight/go-interview-challenge/internal/consumer"
 	"github.com/gpsinsight/go-interview-challenge/internal/server"
+	"github.com/gpsinsight/go-interview-challenge/internal/store"
 	"github.com/gpsinsight/go-interview-challenge/pkg/messages"
 
 	"github.com/confluentinc/confluent-kafka-go/schemaregistry"
@@ -74,7 +75,7 @@ func main() {
 	kafkaConsumer := consumer.NewKafkaConsumer(
 		kafkaReader,
 		protoDeserializer,
-		db,
+		store.NewPgIntradayStore(db),
 		log,
 	)
 	go kafkaConsumer.Run(ctx)
