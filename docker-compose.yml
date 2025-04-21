@@ -3,7 +3,7 @@ services:
   # go-interview-challenge
   #######################################################
   go-interview-challenge:
-    image: cosmtrek/air
+    image: cosmtrek/air:latest
     working_dir: /code
     restart: unless-stopped
     ports:

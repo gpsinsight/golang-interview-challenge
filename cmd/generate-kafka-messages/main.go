@@ -33,7 +33,7 @@ func main() {
 		AllowAutoTopicCreation: true,
 		Balancer:               &kafka.Hash{},
 		Topic:                  cfg.Kafka.Topics.IntradayValues,
-		Async:                  true,
+		Async:                  false,
 	}
 	defer w.Close()
 
