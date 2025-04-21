@@ -1,16 +1,13 @@
-version: "3.5"
-
 services:
   #######################################################
   # go-interview-challenge
   #######################################################
   go-interview-challenge:
-    build:
-      context: .
-      dockerfile: ./build/Dockerfile
+    image: cosmtrek/air
+    working_dir: /code
     restart: unless-stopped
     ports:
-      - "80:80"
+      - "8080:8080"
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: mysecretpassword
@@ -19,9 +16,8 @@ services:
       KAFKA_BROKER_HOSTS: kafka:29092
       KAFKA_REGISTRY_URL: http://kafka:8081
       KAFKA_CONSUMER_GROUP_ID: go-interview-challenge
-    entrypoint: sh -c '/app'
     volumes:
-      - private:/ready
+      - ./:/code
     depends_on:
       postgres:
         condition: service_healthy
@@ -55,8 +51,8 @@ services:
       postgres:
         condition: service_healthy
     volumes:
-      - ./test/liquibase/changelogs/changelog.yaml:/liquibase/changelogs/changelog.yaml
-      - ./test/liquibase/liquibase.properties:/liquibase/liquibase.properties
+      - ./liquibase/changelogs/changelog.yaml:/liquibase/changelogs/changelog.yaml
+      - ./liquibase/liquibase.properties:/liquibase/liquibase.properties
     # entrypoint: sh -c 'tail -f /dev/null'
     command: --defaults-file=/liquibase/liquibase.properties update
     networks:
@@ -66,7 +62,7 @@ services:
   # Kafka
   #######################################################
   kafka:
-    image: docker.redpanda.com/vectorized/redpanda:v22.2.2
+    image: redpandadata/redpanda:latest
     command:
       - redpanda start
       - --smp 1
@@ -88,6 +84,3 @@ services:
 networks:
   local:
     name: go-interview-challenge-net
-
-volumes:
-  private:

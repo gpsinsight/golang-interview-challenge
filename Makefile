@@ -5,10 +5,8 @@ ROOT_DIR = $(shell pwd)
 # RUN COMMANDS
 #################################################################################
 run:
-	go mod vendor
-	docker-compose --file ./build/docker-compose.yml --file ./build/docker-compose.dev.yml --project-directory . up --build; \
-	docker-compose --file ./build/docker-compose.yml --file ./build/docker-compose.dev.yml --project-directory . down --volumes; \
-	rm -rf vendor
+	docker compose --file ./docker-compose.yml --project-directory . up --build; \
+	docker compose --file ./docker-compose.yml --project-directory . down --volumes;
 
 #################################################################################
 # LINT COMMANDS
@@ -29,4 +27,4 @@ protoc:
 # TEST COMMANDS
 #################################################################################
 generate-messages:
-	go run test/generate_messages.go
+	CGO_ENABLED=1 go run cmd/generate-kafka-messages/main.go

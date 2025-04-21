@@ -9,14 +9,14 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/gpsinsight/go-interview-challenge/internal/config"
-	"github.com/gpsinsight/go-interview-challenge/internal/consumer"
-	"github.com/gpsinsight/go-interview-challenge/internal/server"
-	"github.com/gpsinsight/go-interview-challenge/pkg/messages"
-
 	"github.com/confluentinc/confluent-kafka-go/schemaregistry"
 	"github.com/confluentinc/confluent-kafka-go/schemaregistry/serde"
 	"github.com/confluentinc/confluent-kafka-go/schemaregistry/serde/protobuf"
+	"github.com/gpsinsight/go-interview-challenge/internal/config"
+	"github.com/gpsinsight/go-interview-challenge/internal/consumer"
+	"github.com/gpsinsight/go-interview-challenge/internal/server"
+	"github.com/gpsinsight/go-interview-challenge/internal/stocks"
+	"github.com/gpsinsight/go-interview-challenge/pkg/messages"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 	"github.com/segmentio/kafka-go"
@@ -24,24 +24,14 @@ import (
 )
 
 func main() {
-	logger := logrus.New()
-	logger.SetFormatter(&logrus.JSONFormatter{})
-	log := logger.WithField("environment", "local")
+	logger := getLogger()
 
 	cfg, err := config.New()
 	if err != nil {
-		log.Fatal("config.New", err)
+		logger.Fatal("config.New", err)
 	}
 
-	// Setup context that will cancel on signalled termination
-	ctx, cancel := context.WithCancel(context.Background())
-	sig := make(chan os.Signal, 1)
-	signal.Notify(sig, syscall.SIGTERM, syscall.SIGINT)
-	go func() {
-		<-sig
-		log.Info("termination signaled")
-		cancel()
-	}()
+	ctx := getContext(logger)
 
 	db := sqlx.MustConnect("postgres", cfg.Postgres.ConnectionString())
 	db.SetMaxOpenConns(cfg.Postgres.MaxOpenConns)
@@ -53,35 +43,39 @@ func main() {
 		Brokers:     cfg.Kafka.Brokers,
 		GroupID:     cfg.Kafka.GroupID,
 		GroupTopics: []string{cfg.Kafka.Topics.IntradayValues},
-		ErrorLogger: kafka.LoggerFunc(log.Errorf),
+		ErrorLogger: kafka.LoggerFunc(logger.Errorf),
 	})
 	defer kafkaReader.Close()
 
 	client, err := schemaregistry.NewClient(schemaregistry.NewConfig(cfg.Kafka.SchemaRegistry.URL))
 	if err != nil {
-		log.WithError(err).Fatal("not connected to schema registry")
+		logger.WithError(err).Fatal("not connected to schema registry")
 	}
 
 	protoDeserializer, err := protobuf.NewDeserializer(client, serde.ValueSerde, protobuf.NewDeserializerConfig())
 	if err != nil {
-		log.WithError(err).Fatal("failed to set up deserializer")
+		logger.WithError(err).Fatal("failed to set up deserializer")
 	}
 	err = protoDeserializer.ProtoRegistry.RegisterMessage((&messages.IntradayValue{}).ProtoReflect().Type())
 	if err != nil {
-		log.WithError(err).Fatal("failed to register IntradayValue message type")
+		logger.WithError(err).Fatal("failed to register IntradayValue message type")
 	}
+
+	stocksRepository := stocks.NewRepository(logger, db)
+
+	stocksService := stocks.NewService(logger, stocksRepository)
 
 	kafkaConsumer := consumer.NewKafkaConsumer(
 		kafkaReader,
 		protoDeserializer,
-		db,
-		log,
+		stocksService,
+		logger,
 	)
 	go kafkaConsumer.Run(ctx)
 
-	log.Info("Starting up go-interview-challenge")
+	logger.Info("Starting up go-interview-challenge")
 
-	srvr := server.New(cfg, log)
+	srvr := server.New(cfg, logger, stocksService)
 	defer func() {
 		err := srvr.Shutdown(context.Background())
 		if err != nil {
@@ -97,5 +91,27 @@ func main() {
 
 	// Exit safely
 	<-ctx.Done()
-	log.Info("exiting")
+	logger.Info("exiting")
+}
+
+func getLogger() *logrus.Entry {
+	logger := logrus.New()
+	logger.SetFormatter(&logrus.JSONFormatter{})
+	log := logger.WithField("environment", "local")
+
+	return log
+}
+
+func getContext(logger *logrus.Entry) context.Context {
+	// Setup context that will cancel on signalled termination
+	ctx, cancel := context.WithCancel(context.Background())
+	sig := make(chan os.Signal, 1)
+	signal.Notify(sig, syscall.SIGTERM, syscall.SIGINT)
+	go func() {
+		<-sig
+		logger.Info("termination signaled")
+		cancel()
+	}()
+
+	return ctx
 }

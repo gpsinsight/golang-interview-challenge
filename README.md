@@ -8,7 +8,7 @@ This repo contains a little demo service for pulling data about intraday stock v
 ## What is the point of this challenge?
 
 - Demonstrate an ability to quickly get comfortable in a new codebase and make contributions
-- Demonstrate familiarity with the technologies we use every day
+- Demonstrate familiarity with or ability to pick up the technologies we use every day
 - Show us your approach to solving problems
 
 
@@ -25,15 +25,11 @@ This repo contains a little demo service for pulling data about intraday stock v
 
 ![go-interview-challenge visualization](/overview.png "go-interview-challenge visualization")
 
-If you are looking for ways to spice up your project here are some ideas...
-- Try using gRPC or GraphQL instead of REST
-- Show us your take on testing
+These basic requirements are designed to be relatively simple and straightforward to implement. If that is all you have time for that is totally fine. It will give us a flavor for what you can do. However, if you want to go beyond the basics and are looking for ways to spice up your project here are some ideas...
 - Allow for the data to be queried with filters/pagination/etc.
-
-
-## How long should this challenge take?
-
-You are welcome to put in as much time as you like but you should be able to finish it within an hour or so
+- Refactor the project to show how you like to organize your code
+- Show us your take on testing
+- Get creative! This is your chance to make your project stand out. Have fun!
 
 
 ## Getting Started
@@ -44,7 +40,7 @@ You are welcome to put in as much time as you like but you should be able to fin
 
 <p></p>
 
-- Search the repo for `TODO:` tags (there should be two) and follow the instructions
+- Search the repo for `TODO:` tags (there should be four) and follow the instructions
 
 
 ### Running locally
@@ -57,7 +53,7 @@ make run
 
 ## Generating data
 
-To generate message on the kafka topic, use the command
+To generate message on the kafka topic, open a separate terminal session and use the command
 ```
 make generate-messages
 ```

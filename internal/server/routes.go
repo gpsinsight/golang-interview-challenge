@@ -1,7 +1,7 @@
 package server
 
-func (server *Server) Route() {
-	/**
-	 * TODO: Build endpoint for exposing intraday data
-	 */
+import "net/http"
+
+func (s *Server) BuildRoutes() {
+	s.router.HandleFunc("/stocks/{ticker}", s.GetIntradayValues).Methods(http.MethodGet).Name("GetIntradayValues")
 }

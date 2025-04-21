@@ -1,5 +1,0 @@
-# Download the base image for building Go apps
-FROM cosmtrek/air:latest
-
-# Set the working directory
-WORKDIR /app

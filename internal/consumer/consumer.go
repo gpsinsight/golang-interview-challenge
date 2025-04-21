@@ -5,29 +5,29 @@ import (
 	"errors"
 
 	"github.com/confluentinc/confluent-kafka-go/schemaregistry/serde/protobuf"
-	"github.com/jmoiron/sqlx"
+	"github.com/gpsinsight/go-interview-challenge/internal/stocks"
 	"github.com/segmentio/kafka-go"
 	"github.com/sirupsen/logrus"
 )
 
 type KafkaConsumer struct {
-	reader       *kafka.Reader
-	deserializer *protobuf.Deserializer
-	db           *sqlx.DB
-	logger       *logrus.Entry
+	reader        *kafka.Reader
+	deserializer  *protobuf.Deserializer
+	stocksService *stocks.Service
+	logger        *logrus.Entry
 }
 
 func NewKafkaConsumer(
 	reader *kafka.Reader,
 	deserializer *protobuf.Deserializer,
-	db *sqlx.DB,
+	stocksService *stocks.Service,
 	logger *logrus.Entry,
 ) *KafkaConsumer {
 	return &KafkaConsumer{
-		reader:       reader,
-		deserializer: deserializer,
-		db:           db,
-		logger:       logger,
+		reader:        reader,
+		deserializer:  deserializer,
+		stocksService: stocksService,
+		logger:        logger,
 	}
 }
 
@@ -60,7 +60,7 @@ func (kc *KafkaConsumer) processMessage(ctx context.Context, msg kafka.Message) 
 	/**
 	   * TODO:
 		 * - deserialize protobuf message
-		 * - insert data into postgres table
+		 * - call `ProcessStockMessage` method on stocks service
 	*/
 
 	kc.logger.Infof("received message: %s", string(msg.Key))
