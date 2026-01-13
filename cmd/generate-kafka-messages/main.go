@@ -8,9 +8,9 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/confluentinc/confluent-kafka-go/schemaregistry"
-	"github.com/confluentinc/confluent-kafka-go/schemaregistry/serde"
-	"github.com/confluentinc/confluent-kafka-go/schemaregistry/serde/protobuf"
+	"github.com/confluentinc/confluent-kafka-go/v2/schemaregistry"
+	"github.com/confluentinc/confluent-kafka-go/v2/schemaregistry/serde"
+	"github.com/confluentinc/confluent-kafka-go/v2/schemaregistry/serde/protobuf"
 	"github.com/gpsinsight/go-interview-challenge/internal/config"
 	"github.com/gpsinsight/go-interview-challenge/pkg/messages"
 	"github.com/kelseyhightower/envconfig"

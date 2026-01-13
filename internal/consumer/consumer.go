@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 
-	"github.com/confluentinc/confluent-kafka-go/schemaregistry/serde/protobuf"
+	"github.com/confluentinc/confluent-kafka-go/v2/schemaregistry/serde/protobuf"
 	"github.com/gpsinsight/go-interview-challenge/internal/stocks"
 	"github.com/segmentio/kafka-go"
 	"github.com/sirupsen/logrus"
